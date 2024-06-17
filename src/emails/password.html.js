@@ -47,7 +47,7 @@ export const passwordhtml=(token)=>{
     <div class="container">
         <h1>Password Reset</h1>
         <p>You have requested a password reset. Please click the button below to reset your password:</p>
-        <a href="https://safereturn.onrender.com/api/v1/auth/resetpassword/${token}" class="button">Reset Password</a>
+        <a href="https://safe-return.onrender.com/api/v1/auth/resetpassword/${token}" class="button">Reset Password</a>
         <p>If you did not request a password reset, please ignore this email.</p>
         <p>Thank you!</p>
     </div>
