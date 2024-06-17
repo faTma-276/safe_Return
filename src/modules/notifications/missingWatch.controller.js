@@ -4,10 +4,6 @@ import { citizenModel } from "../../../databases/models/citizen.model.js";
 import { foundChildmodel } from "../../../databases/models/foundchildren.model.js";
 import { sendNotification } from './notifService.js';
 import { userModel } from '../../../databases/models/user.model.js';
-import { userNotifModel } from '../../../databases/models/userNotificaion.model.js';
-
-
-
 
 const client = new MongoClient(process.env.DB_ONLINE);
 let changeStreamMissing;

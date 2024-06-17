@@ -261,7 +261,7 @@ export const html=(token)=>{
                                 <table border="0" cellpadding="0" cellspacing="0">
                                   <tbody>
                                     <tr>
-                                      <td> <a href="https://safereturn.onrender.com/api/v1/auth/verify/${token}" target="_blank">confirm email</a> </td>
+                                      <td> <a href="https://safe-return.onrender.com/api/v1/auth/verify/${token}" target="_blank">confirm email</a> </td>
                                     </tr>
                                   </tbody>
                                 </table>
