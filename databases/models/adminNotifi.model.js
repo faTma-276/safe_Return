@@ -16,7 +16,8 @@ const adminNotifSchema=mongoose.Schema({
             const minute = now.getMinutes().toString().padStart(2, '0');
             return `${year}-${month}-${day} ${hour}:${minute}`;
         }
-    }
+    },
+    read: { type: Boolean, default: false }
 },{timestamps:true})
 
 export const adminNotifModel = mongoose.model('adminNotification',adminNotifSchema)

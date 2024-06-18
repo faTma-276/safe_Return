@@ -9,9 +9,10 @@ import morgan from 'morgan'
 import { dbconnection } from './databases/dbconnection.js'
 import { init } from './src/index.routes.js'
 import cors from 'cors'
-
+import { Server } from "socket.io";
 import {  watchMissingChanges } from './src/modules/notifications/missingWatch.controller.js'
 import  {  watchFoundChanges } from './src/modules/notifications/foundChiWatch.controller.js'
+import { adminNotifModel } from './databases/models/adminNotifi.model.js'
 
 dotenv.config()
 const app = express()
@@ -32,10 +33,27 @@ dbconnection()
 
 
 
-app.listen(process.env.PORT||port , console.log(`Example app listening on port ${port}`))
+let server = app.listen(process.env.PORT || port, () => console.log(`Example app listening on port ${port}!`))
 process.on('unhandledRejection',(err)=>{
-console.log('error',err)
+console.log('errrrrrr',err)
 })
+const io = new Server(server ,{
+    cors:"*"
+});
+io.on('connection', (socket) => {
+    console.log(socket.id);
+    console.log('a user connected');
+    
+    
+    socket.on('requestNotificationCount', async () => {
+        const count = await adminNotifModel.find();
+        socket.emit('notificationCount', count.length);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('a user disconnected');
+    });
+});
 
 
 
