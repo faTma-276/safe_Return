@@ -4,6 +4,7 @@ import { citizenModel } from "../../../databases/models/citizen.model.js";
 import { foundChildmodel } from "../../../databases/models/foundchildren.model.js";
 import { sendNotification } from './notifService.js';
 import { userModel } from '../../../databases/models/user.model.js';
+import { adminNotifModel } from '../../../databases/models/adminNotifi.model.js';
 
 const client = new MongoClient(process.env.DB_ONLINE);
 let changeStreamMissing;
@@ -73,6 +74,8 @@ export async function watchMissingChanges() {
         updated: true
       },{ new: true });
     console.log('update:', update);
+    const notifMessage = `A found Children table has new update by an insertion of a missing report : ${update._id} `;
+    await adminNotifModel.insertMany({ message: notifMessage });
     // Get the child name from citizenModel
     const child = await citizenModel.findOne({ nationalID: insertedDoc.nationalID });
     const user = await userModel.findOne({ _id: insertedDoc.createdBy });

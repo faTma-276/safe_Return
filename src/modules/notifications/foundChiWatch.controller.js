@@ -5,6 +5,7 @@ import { foundChildmodel } from '../../../databases/models/foundchildren.model.j
 import { citizenModel } from '../../../databases/models/citizen.model.js';
 import { userModel } from '../../../databases/models/user.model.js';
 import { sendNotification } from './notifService.js';
+import { adminNotifModel } from '../../../databases/models/adminNotifi.model.js';
 
 export async function watchFoundChanges() {
         const client = new MongoClient(process.env.DB_ONLINE);
@@ -63,6 +64,8 @@ export async function handleInsertionFound(insertedDoc) {
                     }, { new: true }
                 );
                 // console.log('update:',update)
+                const notifMessage = `Found Children table has new update : ${update._id} `;
+                await adminNotifModel.insertMany({ message: notifMessage });
                 const child = await citizenModel.findOne({ nationalID: missingDoc.nationalID });
                 const user = await userModel.findOne({ _id: missingDoc.createdBy });
                 console.log("user:",user); console.log(child.name)
