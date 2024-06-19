@@ -64,7 +64,7 @@ export async function handleInsertionFound(insertedDoc) {
                     }, { new: true }
                 );
                 // console.log('update:',update)
-                const notifMessage = `Found Children table has new update : ${update._id} `;
+                const notifMessage = `Found Children table has new update `;
                 await adminNotifModel.insertMany({ message: notifMessage ,id:update._id ,page:"foundChildren.ejs",table:"foundChildmodel"});
                 const child = await citizenModel.findOne({ nationalID: missingDoc.nationalID });
                 const user = await userModel.findOne({ _id: missingDoc.createdBy });
