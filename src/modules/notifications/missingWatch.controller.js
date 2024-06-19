@@ -75,7 +75,7 @@ export async function watchMissingChanges() {
       },{ new: true });
     console.log('update:', update);
     const notifMessage = `A found Children table has new update by an insertion of a missing report  `;
-    await adminNotifModel.insertMany({ message: notifMessage ,id:update._id ,page:"foundChildren.ejs",table:"foundChildmodel"});
+    await adminNotifModel.insertMany({ message: notifMessage ,reportid:update._id ,page:"foundChildren.ejs",table:"/foundChildren"});
     // Get the child name from citizenModel
     const child = await citizenModel.findOne({ nationalID: insertedDoc.nationalID });
     const user = await userModel.findOne({ _id: insertedDoc.createdBy });
