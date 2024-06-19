@@ -17,7 +17,15 @@ const adminNotifSchema=mongoose.Schema({
             return `${year}-${month}-${day} ${hour}:${minute}`;
         }
     },
-    read: { type: Boolean, default: false }
+    id:{
+        type:String
+    },
+    page:{
+        type:String
+    },
+    table:{
+        type:String
+    }
 },{timestamps:true})
 
 export const adminNotifModel = mongoose.model('adminNotification',adminNotifSchema)

@@ -15,8 +15,8 @@ export const addFoundReport = catchError(async (req,res,next)=>{
     req.body.createdBy=req.user._id
     req.body.image={secure_url,public_id}
     const report=await foundModel.insertMany(req.body)
-    const notifMessage = `New foundReport added by ${firstReporterName } ${lastReporterName} : ${req.user._id} `;
-    await adminNotifModel.insertMany({ message: notifMessage });
+    const notifMessage = `New foundReport added by ${firstReporterName } ${lastReporterName} : ${report._id} `;
+    await adminNotifModel.insertMany({ message: notifMessage ,id:report._id ,page:"foundReport.ejs",table:"foundModel" });
     return res.status(200).json({message:"done",report,file:req.file})
 })
 
@@ -50,8 +50,8 @@ export const updateFoundReport =catchError(async(req,res,next)=>{
     }
     const newReport=await foundModel.findOneAndUpdate({createdBy:req.user._id,_id:req.params.id} ,req.body,{new:true})
     console.log(report)
-    const notifMessage = `New foundReport updated by ${newReport.firstReporterName } ${newReport.lastReporterName} : ${req.user._id} `;
-    await adminNotifModel.insertMany({ message: notifMessage });
+    const notifMessage = `New foundReport updated by ${newReport.firstReporterName } ${newReport.lastReporterName} :${newReport._id } `;
+    await adminNotifModel.insertMany({ message: notifMessage ,id:newReport._id ,page:"foundReport.ejs",table:"foundModel"});
     return res.status(200).json({message:"done",newReport,file:req.file})
     }
 })
