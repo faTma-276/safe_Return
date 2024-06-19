@@ -63,18 +63,18 @@ export async function handleInsertionFound(insertedDoc) {
                         updated: true
                     }, { new: true }
                 );
-                // console.log('update:',update)
-                const notifMessage = `Found Children table has new update `;
-                await adminNotifModel.insertMany({ message: notifMessage ,id:update._id ,page:"foundChildren.ejs",table:"foundChildmodel"});
+                console.log('update:',update)
+                const notifMessage = `Found Children table has new update : ${update._id} `;
+                await adminNotifModel.insertMany({ message: notifMessage ,reportid:update._id ,page:"foundChildren.ejs",table:'/foundChildren'});
                 const child = await citizenModel.findOne({ nationalID: missingDoc.nationalID });
                 const user = await userModel.findOne({ _id: missingDoc.createdBy });
                 console.log("user:",user); console.log(child.name)
                 sendNotification(
-                  user.deviceToken,
-                  child.name,
-                  user._id,
-                  missingDoc._id,
-                  missingDoc.email
+                    user.deviceToken,
+                    child.name,
+                    user._id,
+                    missingDoc._id,
+                    missingDoc.email
                 ); 
             }
         } catch (error) {

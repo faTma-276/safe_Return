@@ -17,7 +17,7 @@ const adminNotifSchema=mongoose.Schema({
             return `${year}-${month}-${day} ${hour}:${minute}`;
         }
     },
-    id:{
+    reportid:{
         type:String
     },
     page:{
