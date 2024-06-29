@@ -1,6 +1,5 @@
 import { adminNotifModel } from "../../../databases/models/adminNotifi.model.js";
 import { foundModel } from "../../../databases/models/foundreport.model.js";
-import { deleteOne} from "../../handlers/factor.js";
 import { AppError } from "../../utils/AppError.js";
 import { catchError } from "../../utils/catchAsyncErr.js";
 import cloudnairy from "../../utils/cloudnairy.js";
@@ -15,10 +14,7 @@ export const addFoundReport = catchError(async (req,res,next)=>{
     req.body.createdBy=req.user._id
     req.body.image={secure_url,public_id}
     const report=await foundModel.insertMany(req.body)
-   // console.log(report);
-    //console.log(report[0].firstReporterName );
     const notifMessage = `New foundReport addded by ${firstReporterName} ${lastReporterName}  `;
-    // console.log(report[0].id);
     await adminNotifModel.insertMany({
       message: notifMessage,
       reportid: report[0].id,
@@ -68,5 +64,15 @@ export const updateFoundReport =catchError(async(req,res,next)=>{
 
 
 //deleteFoundReport
-export const deleteFoundReport = deleteOne(foundModel,'report')
+export const deleteFoundReport = catchError(async (req, res, next) => {
+  const report = await foundModel.findOneAndDelete({
+    createdBy: req.user._id,
+    _id: req.params.id,
+  });
+  !report && next(new AppError(`report not found`, 404));
+  if(report) {
+    await adminNotifModel.findOneAndDelete({reportid:report.id})
+    return res.status(201).json({ message: "success", report });
+  } 
+});
 

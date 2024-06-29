@@ -1,31 +1,37 @@
 import mongoose from "mongoose";
 
-const adminNotifSchema=mongoose.Schema({
-    message:{
-        type:String,
-        trim:true,
+const adminNotifSchema = new mongoose.Schema(
+  {
+    message: {
+      type: String,
+      trim: true,
     },
     date: {
-        type: String,
-        default: () => {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = (now.getMonth() + 1).toString().padStart(2, '0');
-            const day = now.getDate().toString().padStart(2, '0');
-            const hour = now.getHours().toString().padStart(2, '0');
-            const minute = now.getMinutes().toString().padStart(2, '0');
-            return `${year}-${month}-${day} ${hour}:${minute}`;
-        }
+      type: String,
+      default: () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, "0");
+        const day = now.getDate().toString().padStart(2, "0");
+        const hour = now.getHours().toString().padStart(2, "0");
+        const minute = now.getMinutes().toString().padStart(2, "0");
+        return `${year}-${month}-${day} ${hour}:${minute}`;
+      },
     },
-    reportid:{
-        type:String
+    reportid: {
+      type: String,
     },
-    page:{
-        type:String
+    page: {
+      type: String,
     },
-    table:{
-        type:String
-    }
-},{timestamps:true})
+    table: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
-export const adminNotifModel = mongoose.model('adminNotification',adminNotifSchema)
+export const adminNotifModel = mongoose.model(
+  "adNotification",
+  adminNotifSchema
+);

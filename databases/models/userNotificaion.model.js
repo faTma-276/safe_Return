@@ -29,4 +29,4 @@ const userNotifSchema =  new mongoose.Schema({
 userNotifSchema.pre(/^find/,function(){
     this.populate('recievedId','userName')
 })
-export const userNotifModel = mongoose.model('UserNotification',userNotifSchema)
+export const userNotifModel = mongoose.model('usNotification',userNotifSchema)

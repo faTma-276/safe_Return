@@ -13,6 +13,7 @@ export const notification = catchError( async (req, res, next) => {
         console.log("update:",update);
         res.status(201).json({ message: 'success : Notifications Initialized'});
 })
+
 export const getAllNotifications = catchError(async (req, res, next) => {
     // console.log(req.user._id)
     let messages = await userNotifModel.find( { recievedId:req.user._id },{body:1,date:1});

@@ -1,5 +1,5 @@
 export const html=(token)=>{
-    return`<!doctype html>
+    return `<!doctype html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width" />
@@ -261,7 +261,7 @@ export const html=(token)=>{
                                 <table border="0" cellpadding="0" cellspacing="0">
                                   <tbody>
                                     <tr>
-                                      <td> <a href="https://safe-return.onrender.com/api/v1/auth/verify/${token}" target="_blank">confirm email</a> </td>
+                                      <td> <a href="http://localhost:3000/api/v1/auth/verify/${token}" target="_blank">confirm email</a> </td>
                                     </tr>
                                   </tbody>
                                 </table>
@@ -305,5 +305,5 @@ export const html=(token)=>{
       </tr>
     </table>
   </body>
-</html>`
+</html>`;
 }

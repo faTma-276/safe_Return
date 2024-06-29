@@ -6,7 +6,7 @@ import { userNotifModel } from "../../../databases/models/userNotificaion.model.
 import { deleteOne, updateOne } from "../../handlers/factor.js";
 import { AppError } from "../../utils/AppError.js";
 import { catchError } from "../../utils/catchAsyncErr.js";
-import { sendNotification } from "../notifications/notifService.js";
+import { handleInsertionMissing, handleUpdateMissing } from "../notifications/handleInsertion.js";
 
 //createMissingReport
 export const addMissingReport = catchError(async (req, res, next) => {
@@ -24,6 +24,7 @@ export const addMissingReport = catchError(async (req, res, next) => {
       req.body.createdBy = req.user._id;
       const report = new missingmodel(req.body);
       await report.save()
+      handleInsertionMissing(report);
       return res.status(201).json({ message: "success", report });
     }
   }
@@ -52,7 +53,16 @@ export const getOneMissingReport = catchError(async (req,res,next)=>{
 })
 
 //updateMissimgReport
-export const updateMissimgReport =updateOne(missingmodel,'report')
+export const updateMissimgReport = catchError(async (req,res,next)=>{
+  const document = await missingmodel.findOneAndUpdate({createdBy:req.user._id,_id:req.params.id} , req.body,{new:true})
+  if (!document)
+    return next(new AppError(`report not found`,404));
+  if (document) {
+    handleUpdateMissing(document)
+    res.status(201).json({message: 'success',document})
+  }
+})      
+
 
 
 //deleteMissingReport

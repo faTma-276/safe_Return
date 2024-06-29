@@ -23,11 +23,14 @@ const resetPasswordSchema = Joi.object({
   confirmPassword: Joi.string().required().valid(Joi.ref("password")).messages({
     "any.only": "Passwords must match",
   }),
-  token: Joi.required(),
 });
 
 const forgetPasswordSchema = Joi.object({
   email: Validation.emailValidation.required(),
+});
+
+const checkResetCodeSchema = Joi.object({
+  resetCode: Joi.string().required(),
 });
 
 const loginWithGmailSchema = Joi.object({
@@ -41,4 +44,5 @@ export {
   resetPasswordSchema,
   forgetPasswordSchema,
   loginWithGmailSchema,
+  checkResetCodeSchema,
 };

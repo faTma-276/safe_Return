@@ -1,8 +1,8 @@
 import  express  from "express";
 const authRouter =express.Router()
 import { validate} from "../../middleware/validation.js";
-import { forgetPassword,  resetPassword, signIn,signUp, verify, loginWithGmail, loginWithFacebook, deleteUser } from "./auth.controller.js";
-import { signUpSchema,signInSchema, resetPasswordSchema, forgetPasswordSchema, loginWithGmailSchema} from "./auth.validate.js";
+import { forgetPassword,  resetPassword, signIn,signUp, verify, loginWithGmail, loginWithFacebook, deleteUser, checkResetCode } from "./auth.controller.js";
+import { signUpSchema,signInSchema, resetPasswordSchema, forgetPasswordSchema, loginWithGmailSchema, checkResetCodeSchema} from "./auth.validate.js";
 
 
 
@@ -19,7 +19,10 @@ authRouter.get('/verify/:token',verify)
 authRouter.post('/forgetpassword',validate(forgetPasswordSchema),forgetPassword)
 
 //reset password
-authRouter.post('/resetpassword/:token',validate(resetPasswordSchema),resetPassword)
+authRouter.post('/resetpassword',validate(resetPasswordSchema),resetPassword)
+
+//check Reset Code
+authRouter.post("/checkResetCode",validate(checkResetCodeSchema), checkResetCode);
 
 //login With Gmail
 authRouter.post("/loginWithGmail", validate(loginWithGmailSchema),loginWithGmail);
@@ -29,6 +32,8 @@ authRouter.post("/loginWithFacebook", loginWithFacebook);
 
 //delete Account
 authRouter.post("/deleteUser", deleteUser);
+
+
 
 
 export default authRouter

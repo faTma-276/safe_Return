@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import { catchError } from "../../utils/catchAsyncErr.js";
 import { userModel } from "../../../databases/models/user.model.js";
-import { sendEmail, sendpassEmail } from "../../emails/user.email.js";
+import { sendEmail, sendPassEmail } from "../../emails/user.email.js";
 import { AppError } from "../../utils/AppError.js";
 import { customAlphabet }  from 'nanoid'
 
@@ -14,8 +14,8 @@ const signUp = catchError(async (req,res,next)=>{
    });
    if(isUser) return next (new AppError('account already exists' , 409))
    req.body.userName = req.body.Fname + " " + req.body.Lname;
-   console.log(req.body.userName);
    const user = new userModel(req.body)
+   user.password = bcrypt.hashSync(user.password, 8);
    await user.save()
    sendEmail({email: req.body.email})
    res.status(201).json({message: 'success',user})
@@ -25,8 +25,9 @@ const signUp = catchError(async (req,res,next)=>{
 const signIn = catchError(async (req,res,next)=>{
    const{ email , password}=req.body
    let user = await userModel.findOne({ email, provider: 'system' });
-   if(!user || !bcrypt.compareSync(password , user.password))
-      return next (new AppError('incorrect email or password' , 409))
+   console.log(user.password);
+   if (!user || !bcrypt.compareSync(password, user.password))
+     return next(new AppError("incorrect email or password", 409));
    if(!user.verified){
       return next (new AppError('unverified email,Please verify it and try again' , 409))}
       let token = jwt.sign({ id: user._id, role: user.role },process.env.jwt_KEY);
@@ -59,28 +60,64 @@ const protectedRouter =catchError(async (req,res,next)=>{
 })
 
 
-//forget password
-const forgetPassword=catchError(async(req,res,next)=>{
-let isUser = await userModel.findOne({email: req.body.email})
-   if(!isUser) return next (new AppError('user not exist' , 409))
-   sendpassEmail({email: req.body.email})
-   res.status(200).json({message:"success" })
 
-})
+//forget Password
+const forgetPassword = catchError(async (req, res, next) => {
+   const customResetCode =customAlphabet('1234567890',4)
+   let isUser = await userModel.findOne({ email: req.body.email });
+   if (!isUser) return next(new AppError("user not exist", 409));
+   if(isUser.provider !='system') return next(new AppError(
+      `your provider is ${isUser.provider} so please continue with ${isUser.provider} directly`
+      , 409));
+   const resetCode = customResetCode();  
+   const resetCodeExpires = Date.now() + 3600000;
+   isUser.resetCode=resetCode
+   isUser.resetCodeExpires=resetCodeExpires
+   await isUser.save();
+   let accesstoken = jwt.sign({ mail: isUser.email }, process.env.jwt_KEY);
+   sendPassEmail({ email: req.body.email, resetCode: resetCode ,userName:isUser.Fname});
+   res.status(200).json({ message: "success", accesstoken });
+});
+
+//check Reset Code
+const checkResetCode = catchError(async (req, res, next) => {
+  let accesstoken = req.headers.accesstoken;
+  if (!accesstoken)return next(new AppError("error in email or email not provided", 401));
+  let decoded = jwt.verify(accesstoken, process.env.jwt_KEY);
+  const user = await userModel.findOne({
+    email: decoded.mail,
+    resetCode:req.body.resetCode
+  });
+  if (!user || user.resetCodeExpires < Date.now()) {
+    return next(new AppError("Invalid or expired reset code", 401));
+  }
+  user.resetCodeProvided = true;
+  await user.save();
+  res.status(200).json({ message: "success"});
+});
 
 
 //reset password
-const resetPassword=catchError(async(req,res,next)=>{
-   const {token}=req.params
-   const {password,confirmPassword}=req.body
-   const decode=jwt.verify(token,process.env.jwt_KEY)
-   const user=await userModel.findOne({email:decode.email})
-         !user && next(new AppError("email not exist"))
-         if(password != confirmPassword)
-         return next(new AppError("password must match comfirmpassword"))
-         const newuser=await userModel.findOneAndUpdate({email:decode.email},{password},{new:true})
-         res.status(200).json({message:"success",newuser})
-})
+const resetPassword = catchError(async (req, res, next) => {
+  let accesstoken = req.headers.accesstoken;
+  if (!accesstoken)
+    return next(new AppError("error in email or email not provided", 401));
+  let decoded = jwt.verify(accesstoken, process.env.jwt_KEY);
+  const user = await userModel.findOne({
+    email: decoded.mail,});
+  if (user.resetCodeProvided == false)
+  return next(new AppError("reset code is not provided", 401));
+  const { password, confirmPassword } = req.body;
+  !user && next(new AppError("email not exist"));
+  if (password != confirmPassword)
+    return next(new AppError("password must match comfirmpassword"));
+   const hashedPassword =bcrypt.hashSync(password, 8);
+  user.password = hashedPassword;
+  await user.save();
+
+  res.status(200).json({ message: "success", user });
+});
+
 
 
 //verify email
@@ -126,8 +163,10 @@ const loginWithFacebook = async (req, res) => {
      provider: 'facebook',
      password: customPassword(),
    });
-    await newUser.save();
-    console.log(newUser);
+   const hashedPassword = bcrypt.hashSync(newUser.password, 8);
+   newUser.password=hashedPassword
+   await newUser.save();
+   console.log(newUser);
    const newToken = jwt.sign({ id: newUser._id, role: newUser.role },process.env.jwt_KEY);
    return res.status(200).json({message: "user logged in successfully",user: newUser,token: newToken});
 };
@@ -152,10 +191,13 @@ const loginWithGmail=catchError(async (req,res,next)=>{
      provider: "google",
      password: customPassword(),
    })
+   const hashedPassword = bcrypt.hashSync(newUser.password, 8);
+   newUser.password = hashedPassword;
    await newUser.save();
    const newToken = jwt.sign({ id: newUser._id, role: newUser.role },process.env.jwt_KEY);
    return res.status(200).json({message: "user logged in successfully",user: newUser,token: newToken});
 });
+
 
 //delete Account
 const deleteUser=catchError(async(req,res,next)=>{
@@ -174,7 +216,8 @@ export {
   allowedTo,
   loginWithGmail,
   loginWithFacebook,
-  deleteUser
+  deleteUser,
+  checkResetCode
 };
 
 
