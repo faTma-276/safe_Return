@@ -94,7 +94,6 @@ export async function handleInsertionFound(insertedDoc) {
             console.log('NationalID not found in foundmodel');
             return null;
         } else {
-            
             console.log('National ID found in missingmodel:', missingDoc);
             // update foundChildmodel
             const update = await foundChildmodel.findOneAndUpdate({ _id: insertedDoc._id },
@@ -111,11 +110,7 @@ export async function handleInsertionFound(insertedDoc) {
             const user = await userModel.findOne({ _id: missingDoc.createdBy });
             console.log("user:",user); console.log(child.name)
             sendNotification(
-                user.deviceToken,
-                child.name,
-                user._id,
-                missingDoc._id,
-                missingDoc.email
+                user.deviceToken,child.name,user._id,missingDoc._id,missingDoc.email
             ); 
         }
     } catch (error) {

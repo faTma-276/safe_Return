@@ -24,7 +24,7 @@ export const getAllNotifications = catchError(async (req, res, next) => {
     res.status(200).json({ message: 'Success', notifications: messages });
 });
 
-
+// deleteNotification
 export const deleteNotification = catchError( async (req, res, next) => {
     let deletedMsg = await userNotifModel.findOneAndDelete( {recievedId:req.user._id,_id:req.params.id});
     !deletedMsg && next(new AppError(`Notifications not found`,404))

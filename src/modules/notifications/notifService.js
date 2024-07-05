@@ -30,11 +30,9 @@ try {
   console.error('Error initializing Firebase Admin SDK:', error);
 }
 export  async function sendNotification (deviceToken, childName, userId,MissingReportId,email) {
-    
     try {
       sendNotifiEmail({ email: email,childName:childName });
       await missingmodel.findOneAndDelete({createdBy:userId,_id:MissingReportId})
-      // Construct the notification message
         const message = {
           token: deviceToken,
           notification: {
@@ -46,15 +44,13 @@ export  async function sendNotification (deviceToken, childName, userId,MissingR
         const response =  await admin.messaging().send(message);
         console.log('Notification sent successfully:', response);
         console.log(message.notification);
-      //Save the notification to the userNotifiModel
         console.log(' save notification to database');
         const notifi = await userNotifModel.insertMany({
             title: message.notification.title,
             body: message.notification.body,
             recievedId: userId,
         });
-        console.log('Notification saved:', notifi);
-        
+        console.log('Notification saved:', notifi); 
     } catch (error) {
         console.error('Error sending notification:', error);
     }
